@@ -1,9 +1,9 @@
 import logging
 from dotenv import load_dotenv
 
-from fetcher import fetch_all
-from snapshot import save
-from universe import build
+from src.data_fetcher.fetcher import fetch_all
+from src.data_fetcher.snapshot import save
+from src.data_fetcher.universe import build
 
 load_dotenv()
 
@@ -17,7 +17,6 @@ log = logging.getLogger(__name__)
 
 def run() -> dict:
     log.info("=== pipeline start ===")
-
     holdings = fetch_all()
 
     if not any(holdings.values()):
@@ -26,14 +25,12 @@ def run() -> dict:
 
     save(holdings)
     universe = build(holdings)
-
     log.info("=== pipeline complete — %d stocks in universe ===", len(universe))
     return universe
 
 
 if __name__ == "__main__":  # pragma: no cover
     universe = run()
-
     top = sorted(universe.items(), key=lambda x: x[1]["avgWeight"], reverse=True)[:20]
     print(f"\n{'Ticker':<8} {'ETFs':<8} {'Avg weight %':<14} Name")
     print("-" * 60)

@@ -2,10 +2,7 @@ import unittest
 from unittest.mock import patch
 import pandas as pd
 
-import sys
-sys.path.insert(0, "src")
-
-from fetcher import fetch_holdings, fetch_all, _parse_holdings, _parse_row
+from src.data_fetcher.fetcher import fetch_holdings, fetch_all, _parse_holdings, _parse_row
 
 
 MOCK_HOLDINGS_DF = pd.DataFrame(
@@ -45,52 +42,39 @@ class TestParseHoldings(unittest.TestCase):
 
 class TestFetchHoldings(unittest.TestCase):
 
-    @patch("fetcher.yf.Ticker")
+    @patch("src.data_fetcher.fetcher.yf.Ticker")
     def test_returns_parsed_holdings(self, mock_ticker):
         mock_ticker.return_value.funds_data.top_holdings = MOCK_HOLDINGS_DF
-
         result = fetch_holdings("VTI")
-
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["asset"], "AAPL")
         self.assertAlmostEqual(result[0]["weightPercentage"], 6.5)
 
-    @patch("fetcher.yf.Ticker")
+    @patch("src.data_fetcher.fetcher.yf.Ticker")
     def test_returns_empty_on_none_data(self, mock_ticker):
         mock_ticker.return_value.funds_data.top_holdings = None
+        self.assertEqual(fetch_holdings("VTI"), [])
 
-        result = fetch_holdings("VTI")
-
-        self.assertEqual(result, [])
-
-    @patch("fetcher.yf.Ticker")
+    @patch("src.data_fetcher.fetcher.yf.Ticker")
     def test_returns_empty_on_exception(self, mock_ticker):
         mock_ticker.side_effect = Exception("network error")
-
-        result = fetch_holdings("VTI")
-
-        self.assertEqual(result, [])
+        self.assertEqual(fetch_holdings("VTI"), [])
 
 
 class TestFetchAll(unittest.TestCase):
 
-    @patch("fetcher.fetch_holdings")
+    @patch("src.data_fetcher.fetcher.fetch_holdings")
     def test_fetches_all_provided_etfs(self, mock_fetch):
         mock_fetch.return_value = [{"asset": "AAPL", "name": "Apple", "weightPercentage": 6.5}]
-
         result = fetch_all(["VTI", "VGT"])
-
         self.assertIn("VTI", result)
         self.assertIn("VGT", result)
         self.assertEqual(mock_fetch.call_count, 2)
 
-    @patch("fetcher.fetch_holdings")
+    @patch("src.data_fetcher.fetcher.fetch_holdings")
     def test_failed_etf_returns_empty_list(self, mock_fetch):
         mock_fetch.return_value = []
-
-        result = fetch_all(["VTI"])
-
-        self.assertEqual(result["VTI"], [])
+        self.assertEqual(fetch_all(["VTI"])["VTI"], [])
 
 
 if __name__ == "__main__":

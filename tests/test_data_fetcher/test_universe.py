@@ -1,10 +1,6 @@
 import unittest
 
-import sys
-sys.path.insert(0, "src")
-
-from universe import build
-
+from src.data_fetcher.universe import build
 
 MOCK_HOLDINGS = {
     "VTI": [
@@ -33,10 +29,9 @@ class TestBuild(unittest.TestCase):
         self.assertEqual(self.universe["MSFT"]["etfCount"], 1)
 
     def test_avg_weight_is_mean_across_holding_etfs(self):
-        expected = round((6.5 + 7.2) / 2, 6)
-        self.assertAlmostEqual(self.universe["AAPL"]["avgWeight"], expected)
+        self.assertAlmostEqual(self.universe["AAPL"]["avgWeight"], round((6.5 + 7.2) / 2, 6))
 
-    def test_single_etf_stock_avg_weight_equals_its_weight(self):
+    def test_single_etf_avg_weight_equals_its_weight(self):
         self.assertAlmostEqual(self.universe["NVDA"]["avgWeight"], 8.1)
 
     def test_etfs_list_tracks_which_etfs_hold_stock(self):
@@ -47,8 +42,7 @@ class TestBuild(unittest.TestCase):
         self.assertNotIn("weights", self.universe["AAPL"])
 
     def test_empty_holdings_returns_empty_universe(self):
-        result = build({})
-        self.assertEqual(result, {})
+        self.assertEqual(build({}), {})
 
     def test_etf_with_no_stocks_is_skipped(self):
         result = build({"VTI": [], "VGT": MOCK_HOLDINGS["VGT"]})
