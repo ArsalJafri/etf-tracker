@@ -12,6 +12,7 @@ TARGET_ETFS = [
     "SPUS",  # SP Funds S&P 500 Shariah
     "ARKK",  # ARK Innovation
     "VUG",   # Vanguard Growth
+    "SMH",   # Semi conductor stock
 ]
 
 
