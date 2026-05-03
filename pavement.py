@@ -15,8 +15,9 @@ def setup():
 
 @task
 def test():
-    sh('python3 -m coverage run --source src/data_fetcher,src/filter_system '
-       '--omit="src/data_fetcher/pipeline.py,src/filter_system/filter_pipeline.py" '
+    sh('python3 -m coverage run '
+       '--source src/data_fetcher,src/filter_system,src/change_detector '
+       '--omit="src/data_fetcher/pipeline.py,src/filter_system/filter_pipeline.py,src/change_detector/detector_pipeline.py" '
        '-m unittest discover -s tests')
     sh('python3 -m coverage html')
     sh('python3 -m coverage report --show-missing')
